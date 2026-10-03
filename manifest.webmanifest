@@ -1,6 +1,6 @@
 {
-  "name": "Cheesecaker",
-  "short_name": "Cheesecaker",
+  "name": "Cheesecake Todo",
+  "short_name": "Cheesecake Todo",
   "description": "Notes with nestable, reorderable checklists.",
   "start_url": "./",
   "scope": "./",
