@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="description" content="Notes with nestable, reorderable checklists.">
+  <meta name="theme-color" content="#fbf6ec" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1c1915" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Cheesecaker">
+  <title>Cheesecaker</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="src/app.js"></script>
+</head>
+<body>
+  <div class="app" id="app" data-view="list">
+    <aside class="sidebar" aria-label="Notes">
+      <header class="bar">
+        <h1 class="brand"><img src="icon.svg" alt="" width="26" height="26"> Cheesecaker</h1>
+        <button class="icon-btn" id="new-note" type="button" aria-label="New note" title="New note">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </header>
+      <nav class="note-list" id="note-list"></nav>
+      <button class="fab" id="new-note-fab" type="button">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> New note
+      </button>
+    </aside>
+
+    <main class="editor-pane">
+      <header class="bar">
+        <button class="icon-btn back" id="back" type="button" aria-label="All notes">
+          <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <span class="spacer"></span>
+        <button class="icon-btn" id="delete-note" type="button" aria-label="Delete note" title="Delete note">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </header>
+
+      <div class="scroller" id="scroller">
+        <article class="note" id="note" hidden>
+          <input class="note-title" id="note-title" placeholder="Title" autocomplete="off" enterkeyhint="next" aria-label="Note title">
+          <div class="checklist" id="active-list" role="list" aria-label="To do"></div>
+          <button class="add-item" id="add-item" type="button">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> List item
+          </button>
+          <p class="hints">Enter new item · Tab / Shift+Tab nest · Alt+↑↓ move · Ctrl+Enter check · drag ⠿ to rearrange (sideways to nest)</p>
+          <section class="done-section" id="done-section" hidden>
+            <div class="done-header">
+              <button class="done-toggle" id="done-toggle" type="button" aria-expanded="true">
+                <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                <span id="done-count"></span>
+              </button>
+              <span class="spacer"></span>
+              <button class="link-btn" id="uncheck-all" type="button">Uncheck all</button>
+              <button class="link-btn" id="clear-done" type="button">Delete all</button>
+            </div>
+            <div class="checklist" id="done-list" role="list" aria-label="Checked"></div>
+          </section>
+        </article>
+        <div class="empty" id="empty" hidden>
+          <p>No notes yet.</p>
+          <button class="primary-btn" id="empty-new" type="button">Create a note</button>
+        </div>
+      </div>
+
+      <div class="item-toolbar" id="item-toolbar" role="toolbar" aria-label="Item actions" hidden>
+        <button type="button" data-action="outdent" aria-label="Outdent" title="Outdent (Shift+Tab)">
+          <svg viewBox="0 0 24 24"><path d="M21 6H11M21 12h-8M21 18H11M7 8l-4 4 4 4"/></svg>
+        </button>
+        <button type="button" data-action="indent" aria-label="Indent" title="Indent (Tab)">
+          <svg viewBox="0 0 24 24"><path d="M21 6H11M21 12h-8M21 18H11M3 8l4 4-4 4"/></svg>
+        </button>
+        <button type="button" data-action="up" aria-label="Move up" title="Move up (Alt+↑)">
+          <svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+        </button>
+        <button type="button" data-action="down" aria-label="Move down" title="Move down (Alt+↓)">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </button>
+        <button type="button" data-action="check" aria-label="Check / uncheck" title="Check / uncheck (Ctrl+Enter)">
+          <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </button>
+        <button type="button" data-action="delete" aria-label="Delete item" title="Delete item">
+          <svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden>
+    <span id="toast-text"></span>
+    <button type="button" id="toast-undo">Undo</button>
+  </div>
+
+  <template id="row-template">
+    <div class="row" role="listitem">
+      <span class="handle" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>
+      </span>
+      <label class="check"><input type="checkbox" aria-label="Done"></label>
+      <textarea class="text" rows="1" spellcheck="true" enterkeyhint="enter" aria-label="Item"></textarea>
+      <button class="del" type="button" aria-label="Delete item" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </template>
+</body>
+</html>

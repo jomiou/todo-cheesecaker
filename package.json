@@ -1,0 +1,12 @@
+{
+  "name": "todo-cheesecaker",
+  "version": "1.0.0",
+  "description": "A notes app with nestable, reorderable checklists. Checked items sink to the bottom and return to their original spot when unchecked.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npx --yes serve -l 5173 .",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "MIT"
+}
