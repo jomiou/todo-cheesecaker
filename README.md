@@ -1,4 +1,4 @@
-# Cheesecake Todo 🍰
+# Cheesecake Keep 🍰
 
 A small, fast notes app built around checklists. No build step, no dependencies, and your notes stay in your browser.
 
