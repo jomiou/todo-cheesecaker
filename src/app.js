@@ -35,6 +35,7 @@ function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (Array.isArray(saved?.notes)) {
+      if (isOldDemo(saved.notes)) return seed();
       saved.notes.forEach((n) => M.normalize(n.items));
       return saved;
     }
@@ -67,34 +68,53 @@ addEventListener('storage', (e) => {
   route();
 });
 
+// The first release shipped different demo notes; swap them out if they're all that's stored.
+function isOldDemo(notes) {
+  const titles = notes.map((n) => n.title).sort().join('|');
+  return titles === 'Cheesecake|Welcome to Cheesecaker';
+}
+
 function seed() {
   const make = (title, lines, minutesAgo) => {
     const t = Date.now() - minutesAgo * 60_000;
     return { id: M.uid(), title, items: M.buildTree(M.parseLines(lines.join('\n'))), createdAt: t, updatedAt: t, doneCollapsed: false };
   };
-  const welcome = make('Welcome to Cheesecaker', [
-    '- Tick a box and the item sinks to the bottom',
-    '- Untick it and it hops back to exactly where it was',
-    '- Press Enter for a new item, Tab to nest it',
-    '  - Shift+Tab (or Backspace at the start) un-nests',
-    '  - Nest as deep as you like',
-    '- Drag the ⠿ handle to rearrange, sideways to nest',
-    '- On a phone, use the toolbar that appears while editing',
-    '- [x] Paste a list from anywhere: bullets and [x] boxes are understood',
+  const guide = make('Getting started', [
+    '- Check off an item and it moves to the bottom',
+    '- Uncheck it and it goes back to its old spot',
+    '- Press Enter to add an item below',
+    '  - Press Tab to nest an item like this one',
+    '    - Items can be nested several levels deep',
+    '  - Press Shift+Tab, or Backspace at the start, to un-nest',
+    '- Drag the ⠿ handle to rearrange; drag sideways to change nesting',
+    '- On a phone, tap an item to open the editing toolbar',
+    '- [x] Paste a bulleted list to add every line at once',
   ], 0);
-  const cheesecake = make('Cheesecake', [
-    '- Base',
-    '  - [x] Digestive biscuits',
-    '  - Butter',
-    '- Filling',
-    '  - Cream cheese',
-    '  - Sugar',
-    '  - Eggs',
-    '  - Vanilla',
-    '- Topping',
-    '  - Strawberries',
+  const trip = make('Weekend trip', [
+    '- Clothes',
+    '  - [x] Rain jacket',
+    '  - Walking shoes',
+    '  - Warm layers',
+    '- Toiletries',
+    '  - Toothbrush',
+    '  - Sunscreen',
+    '- Documents',
+    '  - [x] Train tickets',
+    '  - ID card',
+    '- Charge phone and power bank',
   ], 5);
-  return { notes: [welcome, cheesecake], activeId: welcome.id };
+  const garden = make('Garden project', [
+    '- Prepare the beds',
+    '  - Clear weeds',
+    '  - Add compost',
+    '- Buy seeds',
+    '  - Tomatoes',
+    '  - Basil',
+    '  - Sunflowers',
+    '- [x] Fix the fence gate',
+    '- Set up a watering schedule',
+  ], 10);
+  return { notes: [guide, trip, garden], activeId: guide.id };
 }
 
 // ---------- Helpers ----------
